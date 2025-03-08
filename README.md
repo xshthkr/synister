@@ -24,7 +24,7 @@ Legal disclaimer: **Do not use this without permission from the target**. This t
 
 1.  Clone the repo `git clone https://github.com/xshthkr/synister.git`
 2. `cd synister/src`
-3. `sudo python3 main.py` with the appropiate parameters.
+3. `sudo python3 tcpsynflood.py` with the appropiate parameters.
 
 A `KeyboardInterrupt` [CTRL + C] stops the attack.
 
@@ -40,7 +40,7 @@ Parameters:
 Example usage:
 
 ```bash
-sudo python3 syn_flood.py --src-ip 192.168.20.100 --src-port 5555 --dst-ip 192.168.20.200 --dst-ports 80 443 53
+sudo python3 tcpsynflood.py --src-ip 192.168.20.100 --src-port 5555 --dst-ip 192.168.20.200 --dst-ports 80 443 53
 ```
 
 ---
@@ -114,6 +114,8 @@ tcp_header = struct.pack (
 | Window Size | 16 | `8192` | random receive window size |
 | Checksum | 16 | `computed` | checked at reveicer for integrity |
 | Urgent Pointer | 16 | `0` | not used in SYN packets. |
+
+The Transmission Control Protocol [RFC 9293](https://www.ietf.org/rfc/rfc9293.txt) (updated after RFC 793) has a more detailed description of the protocol and its details.
 
 A pseudoheader is created and injected into the TCP header for calculating the checksum.
 
