@@ -3,7 +3,7 @@
 
 A denial of service attack script written in Python.
 
-Flood the target IP with TCP-SYN packets, filling up their connection table, overwhelming the device and limiting its ability to make new connections, degrading performance. The script first creates raw sockets and builds custom IP and TCP headers for the packets with a spoofed source IP address and port, and then floods the target with the packets. This script also supports multi threaded flooding to maximize intensity.
+Flood the target IP with TCP-SYN packets (hence the name), filling up their connection table, overwhelming the device and limiting its ability to make new connections, degrading performance. The script first creates raw sockets and builds custom IP and TCP headers for the packets with a spoofed source IP address and port, and then floods the target with the packets. This script also supports multi threaded flooding to maximize intensity.
 
 ---
 
