@@ -67,6 +67,22 @@ ip_header = struct.pack (
 )
 ```
 
+| field | size (bits) | value | meaning|
+|---|---|---|---|
+| Version | 4  | `(0x4)` | IPv4 |
+| IHL (header length) | 4  | `(0x5)` | specifies a 20-byte IP header (5 × 4 bytes) |
+| Type of Service (TOS) | 8  | `(0x00)` | default service (not using QoS features) |
+| Total Length | 16 | `40 + payload_size` | length of IP header + TCP header + payload |
+| Identification | 16 | `60069` | random unique identifier |
+| Flags + Fragment Offset | 3 + 13 | `0` | no fragmentation (DF flag not set) |
+| Time To Live (TTL) | 8  | `255` | maximum packet lifespan in hops |
+| Protocol | 8  | `socket.IPPROTO_TCP` (`6`) | specifies that this is a TCP packet |
+| Header Checksum | 16 | `computed` | checked at receiver for integrity |
+| Source IP | 32 | `src_ip` | (spoofed) source address |
+| Destination IP | 32 | `dst_ip` | targets IP address |
+
+The Internet Protocol [RFC 791](https://www.ietf.org/rfc/rfc791.txt) has a more detailed description of the protocol and its details.
+
 We calculate the checksum and then update the checksum field of the IP header.
 
 TCP header:
@@ -85,6 +101,19 @@ tcp_header = struct.pack (
         0                   # urgent pointer
 )
 ```
+
+| field | size (bits) | value | meaning |
+|-----|----|----|---|
+| Source Port | 16 | `src_port` | (spoofed) source address |
+| Destination Port | 16 | `dst_port` | target port  |
+| Sequence Number | 32 | `0` | usually randomized in real TCP. not used in this attack |
+| Acknowledgment Number | 32 | `0` | not used in SYN packets |
+| Data Offset (header length) | 4  | `5` (0x50) | specifies 20-byte TCP header (5 × 4 bytes) |
+| Reserved | 3  | `0` | not used |
+| Flags | 9  | `SYN (0x02)` | indicates a connection request |
+| Window Size | 16 | `8192` | random receive window size |
+| Checksum | 16 | `computed` | checked at reveicer for integrity |
+| Urgent Pointer | 16 | `0` | not used in SYN packets. |
 
 A pseudoheader is created and injected into the TCP header for calculating the checksum.
 
